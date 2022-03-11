@@ -1,12 +1,10 @@
 package tourGuide.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import tourGuide.dto.DistanceDTO;
+import tourGuide.dto.UserRewardDTO;
 import tourGuide.model.Attraction;
-import tourGuide.proxy.GpsProxy;
+import tourGuide.model.UserReward;
 import tourGuide.services.RewardsService;
 
 import java.util.List;
@@ -16,33 +14,45 @@ import java.util.UUID;
 public class RewardController {
 
     private final RewardsService rewardsService;
-    @Autowired
-    GpsProxy gpsProxy;
 
     public RewardController(RewardsService rewardsService) {
         this.rewardsService = rewardsService;
     }
 
+/*    private final GpsProxy gpsProxy;
+
+    public RewardController(RewardsService rewardsService, GpsProxy gpsProxy) {
+        this.rewardsService = rewardsService;
+        this.gpsProxy = gpsProxy;
+    }*/
+
+
+
     @GetMapping("getRewardPoints/{attractionId}/{userId}")
-    public int getRewardPoint(@RequestParam String attractionId, @RequestParam String userID){
-        System.out.println("On passe dans le controller");
-        return rewardsService.getRewardPoints(UUID.fromString(attractionId), UUID.fromString(userID));
+    public int getRewardPoint(@PathVariable String attractionId, @PathVariable String userId){
+        return rewardsService.getRewardPoints(UUID.fromString(attractionId), UUID.fromString(userId));
     }
 
-    @GetMapping("getBidon/{attractionId}")
-    public int getBidon(@PathVariable("attractionId") String attractionId){
-        return 10;
+    @GetMapping("getNearAttractions/{userId}")
+    public List<Attraction> getNearAttractions(@PathVariable String userId){
+        return rewardsService.getNearAttractions(UUID.fromString(userId));
     }
 
-    @GetMapping("getAttractions")
+    /*@GetMapping("getAttractions")
     public List<Attraction> getAttractions(){
         return gpsProxy.getAttractions();
+    }*/
+
+    @PostMapping("calculateRewards")
+    public List<UserReward> calculateRewards(@RequestBody UserRewardDTO userRewardDTO){
+        return rewardsService.calculateRewards(userRewardDTO);
     }
 
-    @GetMapping("getStatusRewards")
-    public String status(){
-        return "C'est ok ! ";
+    @PostMapping("getDistance")// get distance
+    public double getDistance(@RequestBody DistanceDTO distanceDTO){
+        return rewardsService.getDistance(distanceDTO.getLoc1(), distanceDTO.getLoc1());
     }
+
 
 
 }

@@ -2,14 +2,18 @@ package tourGuide.services;
 
 import org.springframework.stereotype.Service;
 import rewardCentral.RewardCentral;
+import tourGuide.dto.UserRewardDTO;
 import tourGuide.model.Attraction;
 import tourGuide.model.Location;
+import tourGuide.model.UserReward;
 import tourGuide.model.VisitedLocation;
+import tourGuide.proxy.GpsProxy;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class RewardsService {
@@ -17,12 +21,15 @@ public class RewardsService {
     private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
     //Proximity in miles
     private static final int DEFAUlT_PROXIMITY_BUFFER = 10;;
-    private static final int ATTRACTION_PROXIMITY_RANGE = 200;
+    private static final int ATTRACTION_PROXIMITY_RANGE = 10000;
 
     private int proximityBuffer = DEFAUlT_PROXIMITY_BUFFER;
-    private final RewardCentral rewardCentral;
 
-    public RewardsService() {
+    private final RewardCentral rewardCentral;
+    private final GpsProxy gpsProxy;
+
+    public RewardsService(GpsProxy gpsProxy) {
+        this.gpsProxy = gpsProxy;
         this.rewardCentral = new RewardCentral() ;
     }
 
@@ -30,14 +37,36 @@ public class RewardsService {
         return rewardCentral.getAttractionRewardPoints(attractionId, userId);
     }
 
-    public int getBidon(UUID attractionId) {
-        try {
-            TimeUnit.MILLISECONDS.sleep((long) ThreadLocalRandom.current().nextInt(1, 1000));
-        } catch (InterruptedException var4) {
+    /**
+     * List all attractions (sorted by distance) close enough of an user
+     * @param userId
+     * @return
+     */
+    public List<Attraction> getNearAttractions(UUID userId){
+        List<Attraction> nearbyAttractions = new ArrayList<>();
+        Location userLoc = gpsProxy.getUserLocation(String.valueOf(userId)).getLocation();
+        for (Attraction att : gpsProxy.getAttractions()){
+            if(isWithinAttractionProximity(att, userLoc)){
+                nearbyAttractions.add(att);
+            }
         }
+        return nearbyAttractions.stream().sorted(
+                Comparator.comparingDouble((Attraction at) -> getDistance(userLoc, new Location(at.getLatitude(), at.getLongitude())))
+        ).collect(Collectors.toList());
+    }
 
-        int randomInt = ThreadLocalRandom.current().nextInt(1, 1000);
-        return randomInt;
+    // probleme car on re-parcourt à chaque fois la liste des VisistedLocation --> performances ?
+    public List<UserReward> calculateRewards(UserRewardDTO calculateRewardDTO) {
+        List<UserReward> rewards = new ArrayList<>();
+        for (VisitedLocation visitedLoc : calculateRewardDTO.getVisitedLocations()){
+            for (Attraction attraction : gpsProxy.getAttractions()){
+                if (nearAttraction(visitedLoc, attraction)){
+                    int rewardPoints = getRewardPoints(attraction.getAttractionId(), calculateRewardDTO.getUserId());
+                    rewards.add(new UserReward(visitedLoc, attraction, rewardPoints));
+                }
+            }
+        }
+        return rewards;
     }
 
 /*    *//**
@@ -81,7 +110,7 @@ public class RewardsService {
      *      *  <li>false if the attraction is considered too far form the visitedLocation</li></ul>
      */
     public boolean nearAttraction(VisitedLocation visitedLocation, Attraction attraction){
-        return getDistance(attraction, visitedLocation.location) > proximityBuffer ? false : true;
+        return getDistance(attraction, visitedLocation.getLocation()) > proximityBuffer ? false : true;
     }
 
     public void setProximityBuffer(int proximityBuffer){
@@ -95,7 +124,7 @@ public class RewardsService {
      * @return
      */
     private double getDistance(Attraction attraction, Location location){
-        return getDistance(new Location (attraction.latitude, attraction.longitude), location);
+        return getDistance(new Location (attraction.getLatitude(), attraction.getLongitude()), location);
     }
 
     /**
@@ -104,11 +133,11 @@ public class RewardsService {
      * @param loc2
      * @return
      */
-    private static double getDistance(Location loc1, Location loc2) {
-        double lat1 = Math.toRadians(loc1.latitude);
-        double lon1 = Math.toRadians(loc1.longitude);
-        double lat2 = Math.toRadians(loc2.latitude);
-        double lon2 = Math.toRadians(loc2.longitude);
+    public static double getDistance(Location loc1, Location loc2) {
+        double lat1 = Math.toRadians(loc1.getLatitude());
+        double lon1 = Math.toRadians(loc1.getLongitude());
+        double lat2 = Math.toRadians(loc2.getLatitude());
+        double lon2 = Math.toRadians(loc2.getLongitude());
 
         double angle = Math.acos(Math.sin(lat1) * Math.sin(lat2)
                 + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon1 - lon2));

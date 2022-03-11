@@ -1,7 +1,10 @@
 package tourGuide.model;
 
+import lombok.Data;
+
 import java.util.UUID;
 
+@Data
 public class Attraction extends Location {
     public final String attractionName;
     public final String city;

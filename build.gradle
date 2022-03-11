@@ -14,6 +14,11 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: "jacoco"
 
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:Greenwich.SR2"
+    }
+}
 
 bootJar {
     baseName = 'ms-rewards'
@@ -43,9 +48,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
 
-    // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-feign
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-feign', version: '1.4.7.RELEASE'
-
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.1.2.RELEASE'
 
     testCompile("junit:junit")
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.1.6.RELEASE'
