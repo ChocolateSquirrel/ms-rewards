@@ -2,6 +2,7 @@ package tourGuide.controller;
 
 import org.springframework.web.bind.annotation.*;
 import tourGuide.dto.DistanceDTO;
+import tourGuide.dto.AskNearAttractionsDTO;
 import tourGuide.dto.UserRewardDTO;
 import tourGuide.model.Attraction;
 import tourGuide.model.UserReward;
@@ -33,14 +34,14 @@ public class RewardController {
         return rewardsService.getRewardPoints(UUID.fromString(attractionId), UUID.fromString(userId));
     }
 
-    @GetMapping("getNearByAttractions/{userId}/{number}")
-    public List<Attraction> getNearByAttractions(@PathVariable String userId, @PathVariable int number){
-        return rewardsService.getNearByAttractions(UUID.fromString(userId), number);
+    @PostMapping("getNearByAttractions")
+    public List<Attraction> getNearByAttractions(@RequestBody AskNearAttractionsDTO askNearAttractionsDTO){
+        return rewardsService.getNearByAttractions(askNearAttractionsDTO.getLocation(), askNearAttractionsDTO.getNbAttractions());
     }
 
-    @GetMapping("getNearestAttractions/{userId}")
-    public List<Attraction> getNearestAttractions(@PathVariable String userId){
-        return rewardsService.getNearestAttractions(UUID.fromString(userId));
+    @PostMapping("getNearestAttractions")
+    public List<Attraction> getNearestAttractions(@RequestBody AskNearAttractionsDTO askNearAttractionsDTO){
+        return rewardsService.getNearestAttractions(askNearAttractionsDTO.getLocation(), askNearAttractionsDTO.getNbAttractions());
     }
 
     /*@GetMapping("getAttractions")

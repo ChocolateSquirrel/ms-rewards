@@ -21,7 +21,7 @@ public class RewardsService {
     private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
     //Proximity in miles
     private static final int DEFAUlT_PROXIMITY_BUFFER = 10;;
-    private static final int ATTRACTION_PROXIMITY_RANGE = 200;
+    private static final int ATTRACTION_PROXIMITY_RANGE = 3000;
 
     private int proximityBuffer = DEFAUlT_PROXIMITY_BUFFER;
 
@@ -37,34 +37,24 @@ public class RewardsService {
         return rewardCentral.getAttractionRewardPoints(attractionId, userId);
     }
 
-    /**
-     * Retrieve a list of attractions sorted by distance between their locations and the location of the user
-     * @param userId
-     * @param number : the number of attractions in the list
-     * @return
-     */
-    public List<Attraction> getNearByAttractions(UUID userId, int number) {
-        Location userLoc = gpsProxy.getUserLocation(String.valueOf(userId)).getLocation();
-        return gpsProxy.getAttractions().stream().sorted(
-                (att1, att2) -> Double.compare(getDistance(att1, userLoc), getDistance(att2, userLoc))
-        ).collect(Collectors.toList());
+    public List<Attraction> getNearByAttractions(Location location, int nbAttractions) {
+        return sortedAttractionsByDistanceFromLocation(location).subList(0, nbAttractions);
     }
 
-    /**
-     * List all attractions (sorted by distance) close enough of an user
-     * @param userId
-     * @return
-     */
-    public List<Attraction> getNearestAttractions(UUID userId){
-        List<Attraction> nearbyAttractions = new ArrayList<>();
-        Location userLoc = gpsProxy.getUserLocation(String.valueOf(userId)).getLocation();
-        for (Attraction att : gpsProxy.getAttractions()){
-            if(isWithinAttractionProximity(att, userLoc)){
-                nearbyAttractions.add(att);
+    public List<Attraction> getNearestAttractions(Location location, int nbAttractions){
+        List<Attraction> nearestAttractions = new ArrayList<>();
+        List<Attraction> nearByAttractions = sortedAttractionsByDistanceFromLocation(location).subList(0, nbAttractions);
+        for (Attraction att : nearByAttractions){
+            if(isWithinAttractionProximity(att, location)){
+                nearestAttractions.add(att);
             }
         }
-        return nearbyAttractions.stream().sorted(
-                Comparator.comparingDouble((Attraction at) -> getDistance(userLoc, new Location(at.getLatitude(), at.getLongitude())))
+        return nearestAttractions;
+    }
+
+    private List<Attraction> sortedAttractionsByDistanceFromLocation(Location location) {
+        return gpsProxy.getAttractions().stream().sorted(
+                (att1, att2) -> Double.compare(getDistance(att1, location), getDistance(att2, location))
         ).collect(Collectors.toList());
     }
 

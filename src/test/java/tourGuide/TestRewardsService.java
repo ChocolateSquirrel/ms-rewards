@@ -50,12 +50,5 @@ public class TestRewardsService {
         assertTrue(rewardsService.isWithinAttractionProximity(attraction, closeLocation));
     }
 
-    @Test
-    public void getNearByAttractionsTest(){
-        RewardsService rewardsService = new RewardsService(gpsProxy);
-        List<Attraction> attractions = rewardsService.getNearByAttractions(UUID.randomUUID(), 5);
-        assertEquals(5, attractions.size());
-    }
-
 	
 }
