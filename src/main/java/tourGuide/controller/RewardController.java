@@ -33,9 +33,14 @@ public class RewardController {
         return rewardsService.getRewardPoints(UUID.fromString(attractionId), UUID.fromString(userId));
     }
 
-    @GetMapping("getNearAttractions/{userId}")
-    public List<Attraction> getNearAttractions(@PathVariable String userId){
-        return rewardsService.getNearAttractions(UUID.fromString(userId));
+    @GetMapping("getNearByAttractions/{userId}/{number}")
+    public List<Attraction> getNearByAttractions(@PathVariable String userId, @PathVariable int number){
+        return rewardsService.getNearByAttractions(UUID.fromString(userId), number);
+    }
+
+    @GetMapping("getNearestAttractions/{userId}")
+    public List<Attraction> getNearestAttractions(@PathVariable String userId){
+        return rewardsService.getNearestAttractions(UUID.fromString(userId));
     }
 
     /*@GetMapping("getAttractions")
@@ -50,7 +55,7 @@ public class RewardController {
 
     @PostMapping("getDistance")// get distance
     public double getDistance(@RequestBody DistanceDTO distanceDTO){
-        return rewardsService.getDistance(distanceDTO.getLoc1(), distanceDTO.getLoc1());
+        return rewardsService.getDistance(distanceDTO.getLoc1(), distanceDTO.getLoc2());
     }
 
 

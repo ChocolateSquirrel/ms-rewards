@@ -38,11 +38,24 @@ public class RewardsService {
     }
 
     /**
+     * Retrieve a list of attractions sorted by distance between their locations and the location of the user
+     * @param userId
+     * @param number : the number of attractions in the list
+     * @return
+     */
+    public List<Attraction> getNearByAttractions(UUID userId, int number) {
+        Location userLoc = gpsProxy.getUserLocation(String.valueOf(userId)).getLocation();
+        return gpsProxy.getAttractions().stream().sorted(
+                (att1, att2) -> Double.compare(getDistance(att1, userLoc), getDistance(att2, userLoc))
+        ).collect(Collectors.toList());
+    }
+
+    /**
      * List all attractions (sorted by distance) close enough of an user
      * @param userId
      * @return
      */
-    public List<Attraction> getNearAttractions(UUID userId){
+    public List<Attraction> getNearestAttractions(UUID userId){
         List<Attraction> nearbyAttractions = new ArrayList<>();
         Location userLoc = gpsProxy.getUserLocation(String.valueOf(userId)).getLocation();
         for (Attraction att : gpsProxy.getAttractions()){
@@ -123,7 +136,7 @@ public class RewardsService {
      * @param location
      * @return
      */
-    private double getDistance(Attraction attraction, Location location){
+    private static double getDistance(Attraction attraction, Location location){
         return getDistance(new Location (attraction.getLatitude(), attraction.getLongitude()), location);
     }
 
