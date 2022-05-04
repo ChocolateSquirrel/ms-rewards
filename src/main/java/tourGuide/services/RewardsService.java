@@ -21,7 +21,7 @@ public class RewardsService {
     private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
     //Proximity in miles
     private static final int DEFAUlT_PROXIMITY_BUFFER = 10;;
-    private static final int ATTRACTION_PROXIMITY_RANGE = 3000;
+    private static final int ATTRACTION_PROXIMITY_RANGE = 200;
 
     private int proximityBuffer = DEFAUlT_PROXIMITY_BUFFER;
 
@@ -31,6 +31,14 @@ public class RewardsService {
     public RewardsService(GpsProxy gpsProxy) {
         this.gpsProxy = gpsProxy;
         this.rewardCentral = new RewardCentral() ;
+    }
+
+    public void setProximityBuffer(int proximityBuffer) {
+        this.proximityBuffer = proximityBuffer;
+    }
+
+    public void setDefaultProximityBuffer() {
+        proximityBuffer = DEFAUlT_PROXIMITY_BUFFER;
     }
 
     public int getRewardPoints(UUID attractionId, UUID userId) {
@@ -58,18 +66,24 @@ public class RewardsService {
         ).collect(Collectors.toList());
     }
 
-    // probleme car on re-parcourt à chaque fois la liste des VisistedLocation --> performances ?
     public List<UserReward> calculateRewards(UserRewardDTO calculateRewardDTO) {
         List<UserReward> rewards = new ArrayList<>();
         for (VisitedLocation visitedLoc : calculateRewardDTO.getVisitedLocations()){
             for (Attraction attraction : gpsProxy.getAttractions()){
                 if (nearAttraction(visitedLoc, attraction)){
-                    int rewardPoints = getRewardPoints(attraction.getAttractionId(), calculateRewardDTO.getUserId());
-                    rewards.add(new UserReward(visitedLoc, attraction, rewardPoints));
+                    //Make sure an attraction is counted only once
+                    if (!isAttractionAlreadyInRewards(rewards, attraction)){
+                        int rewardPoints = getRewardPoints(attraction.getAttractionId(), calculateRewardDTO.getUserId());
+                        rewards.add(new UserReward(visitedLoc, attraction, rewardPoints));
+                    }
                 }
             }
         }
         return rewards;
+    }
+
+    private boolean isAttractionAlreadyInRewards(List<UserReward> userRewards, Attraction attraction){
+        return userRewards.stream().filter(userReward -> userReward.getAttraction().getAttractionName().equals(attraction.getAttractionName())).count() == 0 ? false : true;
     }
 
     /**
@@ -93,10 +107,6 @@ public class RewardsService {
      */
     public boolean nearAttraction(VisitedLocation visitedLocation, Attraction attraction){
         return getDistance(attraction, visitedLocation.getLocation()) > proximityBuffer ? false : true;
-    }
-
-    public void setProximityBuffer(int proximityBuffer){
-        this.proximityBuffer = proximityBuffer;
     }
 
     /**

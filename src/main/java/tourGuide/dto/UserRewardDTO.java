@@ -14,5 +14,4 @@ public class UserRewardDTO {
 
     public UserRewardDTO() {}
 
-
 }

@@ -20,14 +20,6 @@ public class RewardController {
         this.rewardsService = rewardsService;
     }
 
-/*    private final GpsProxy gpsProxy;
-
-    public RewardController(RewardsService rewardsService, GpsProxy gpsProxy) {
-        this.rewardsService = rewardsService;
-        this.gpsProxy = gpsProxy;
-    }*/
-
-
 
     @GetMapping("getRewardPoints/{attractionId}/{userId}")
     public int getRewardPoint(@PathVariable String attractionId, @PathVariable String userId){
@@ -44,17 +36,22 @@ public class RewardController {
         return rewardsService.getNearestAttractions(askNearAttractionsDTO.getLocation(), askNearAttractionsDTO.getNbAttractions());
     }
 
-    /*@GetMapping("getAttractions")
-    public List<Attraction> getAttractions(){
-        return gpsProxy.getAttractions();
-    }*/
+    @PostMapping("setProximityBuffer")
+    public void setProximityBuffer(@RequestBody int proximityBuffer){
+        rewardsService.setProximityBuffer(proximityBuffer);
+    }
+
+    @PostMapping("setDefaultProximityBuffer")
+    public void setDefaultProximityBuffer(){
+        rewardsService.setDefaultProximityBuffer();
+    }
 
     @PostMapping("calculateRewards")
     public List<UserReward> calculateRewards(@RequestBody UserRewardDTO userRewardDTO){
         return rewardsService.calculateRewards(userRewardDTO);
     }
 
-    @PostMapping("getDistance")// get distance
+    @PostMapping("getDistance")
     public double getDistance(@RequestBody DistanceDTO distanceDTO){
         return rewardsService.getDistance(distanceDTO.getLoc1(), distanceDTO.getLoc2());
     }
