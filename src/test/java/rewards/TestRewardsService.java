@@ -1,4 +1,4 @@
-package tourGuide;
+package rewards;
 
 import static org.junit.Assert.*;
 
@@ -10,13 +10,13 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import tourGuide.dto.UserRewardDTO;
-import tourGuide.model.Attraction;
-import tourGuide.model.Location;
-import tourGuide.model.UserReward;
-import tourGuide.model.VisitedLocation;
-import tourGuide.proxy.GpsProxy;
-import tourGuide.services.RewardsService;
+import rewards.dto.UserRewardDTO;
+import rewards.model.Attraction;
+import rewards.model.Location;
+import rewards.model.UserReward;
+import rewards.model.VisitedLocation;
+import rewards.proxy.GpsProxy;
+import rewards.services.RewardsService;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -112,6 +112,4 @@ public class TestRewardsService {
 
     }
 
-
-	
 }

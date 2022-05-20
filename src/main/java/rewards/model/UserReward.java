@@ -1,4 +1,4 @@
-package tourGuide.model;
+package rewards.model;
 
 import lombok.Data;
 

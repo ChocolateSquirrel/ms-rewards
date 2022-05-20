@@ -1,16 +1,15 @@
-package tourGuide.services;
+package rewards.services;
 
 import org.springframework.stereotype.Service;
 import rewardCentral.RewardCentral;
-import tourGuide.dto.UserRewardDTO;
-import tourGuide.model.Attraction;
-import tourGuide.model.Location;
-import tourGuide.model.UserReward;
-import tourGuide.model.VisitedLocation;
-import tourGuide.proxy.GpsProxy;
+import rewards.dto.UserRewardDTO;
+import rewards.model.Attraction;
+import rewards.model.Location;
+import rewards.model.UserReward;
+import rewards.model.VisitedLocation;
+import rewards.proxy.GpsProxy;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -20,7 +19,7 @@ public class RewardsService {
 
     private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
     //Proximity in miles
-    private static final int DEFAUlT_PROXIMITY_BUFFER = 10;;
+    private static final int DEFAUlT_PROXIMITY_BUFFER = 10;
     private static final int ATTRACTION_PROXIMITY_RANGE = 200;
 
     private int proximityBuffer = DEFAUlT_PROXIMITY_BUFFER;
@@ -45,10 +44,22 @@ public class RewardsService {
         return rewardCentral.getAttractionRewardPoints(attractionId, userId);
     }
 
+    /**
+     * Create a list of attractions sorted by croissant distance from a location
+     * @param location : location considered to compute distance
+     * @param nbAttractions : number of attractions in the list
+     * @return the sorted list
+     */
     public List<Attraction> getNearByAttractions(Location location, int nbAttractions) {
         return sortedAttractionsByDistanceFromLocation(location).subList(0, nbAttractions);
     }
 
+    /**
+     * Create a list of attractions which are distant of ATTRACTION_PROXIMITY_RANGE from a location
+     * @param location : location considered to compute distance
+     * @param nbAttractions : number of attractions in the list
+     * @return the sorted list
+     */
     public List<Attraction> getNearestAttractions(Location location, int nbAttractions){
         List<Attraction> nearestAttractions = new ArrayList<>();
         List<Attraction> nearByAttractions = sortedAttractionsByDistanceFromLocation(location).subList(0, nbAttractions);

@@ -1,7 +1,7 @@
-package tourGuide.dto;
+package rewards.dto;
 
 import lombok.Data;
-import tourGuide.model.VisitedLocation;
+import rewards.model.VisitedLocation;
 
 import java.util.List;
 import java.util.UUID;

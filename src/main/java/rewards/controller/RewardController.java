@@ -1,12 +1,12 @@
-package tourGuide.controller;
+package rewards.controller;
 
 import org.springframework.web.bind.annotation.*;
-import tourGuide.dto.DistanceDTO;
-import tourGuide.dto.AskNearAttractionsDTO;
-import tourGuide.dto.UserRewardDTO;
-import tourGuide.model.Attraction;
-import tourGuide.model.UserReward;
-import tourGuide.services.RewardsService;
+import rewards.dto.DistanceDTO;
+import rewards.dto.AskNearAttractionsDTO;
+import rewards.dto.UserRewardDTO;
+import rewards.model.Attraction;
+import rewards.model.UserReward;
+import rewards.services.RewardsService;
 
 import java.util.List;
 import java.util.UUID;

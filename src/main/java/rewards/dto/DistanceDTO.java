@@ -1,7 +1,7 @@
-package tourGuide.dto;
+package rewards.dto;
 
 import lombok.Data;
-import tourGuide.model.Location;
+import rewards.model.Location;
 
 @Data
 public class DistanceDTO {
