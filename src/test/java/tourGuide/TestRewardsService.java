@@ -29,6 +29,45 @@ public class TestRewardsService {
 	public static void setup(){
 		Locale.setDefault(Locale.US);
 	}
+
+    @Test
+    public void getNearByAttractionsTest() {
+        RewardsService rewardsService = new RewardsService(gpsProxy);
+        Location randomLocation = new Location(33, -118);
+
+        List<Attraction> attractions = rewardsService.getNearByAttractions(randomLocation, 10);
+        double dist1 = RewardsService.getDistance(attractions.get(0), randomLocation);
+        double dist2 = RewardsService.getDistance(attractions.get(1), randomLocation);
+
+        assertEquals(10, attractions.size());
+        assertTrue(dist1 <= dist2);
+    }
+
+    @Test
+    public void getNearestAttractionsTest_LessThanAsk() {
+        RewardsService rewardsService = new RewardsService(gpsProxy);
+        Location randomLocation = new Location(33, -118);
+
+        List<Attraction> attractions = rewardsService.getNearestAttractions(randomLocation, 10);//ATTRACTION_PROXIMITY_RANGE = 200
+        double dist1 = RewardsService.getDistance(attractions.get(0), randomLocation);
+        double dist2 = RewardsService.getDistance(attractions.get(1), randomLocation);
+
+        assertEquals(3, attractions.size());
+        assertTrue(dist1 <= dist2);
+    }
+
+    @Test
+    public void getNearestAttractionsTest_MoreThanAsk() {
+        RewardsService rewardsService = new RewardsService(gpsProxy);
+        Location randomLocation = new Location(33, -118);
+
+        List<Attraction> attractions = rewardsService.getNearestAttractions(randomLocation, 2);//ATTRACTION_PROXIMITY_RANGE = 200
+        double dist1 = RewardsService.getDistance(attractions.get(0), randomLocation);
+        double dist2 = RewardsService.getDistance(attractions.get(1), randomLocation);
+
+        assertEquals(2, attractions.size());
+        assertTrue(dist1 <= dist2);
+    }
 	
 	@Test
 	public void isWithinAttractionProximityTest_WithSameLocation() {
