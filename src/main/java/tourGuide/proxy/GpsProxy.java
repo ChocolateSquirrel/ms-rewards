@@ -10,7 +10,7 @@ import tourGuide.model.VisitedLocation;
 import java.util.List;
 import java.util.UUID;
 
-@FeignClient(name = "ms-gps", url = "localhost:6060")
+@FeignClient(name = "ms-gps", url = "ms-gps:6060")
 public interface GpsProxy {
 
     @RequestMapping ("getAttractions")
